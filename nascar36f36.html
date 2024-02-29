@@ -40,9 +40,9 @@
             <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
                 <div class="d-flex justify-content-center">
                     <div class="text-center">
-                        <h1 class="mx-auto my-0 text-uppercase">Race Winners</h1>
-                        <h2 class="text-white-50 mx-auto mt-2 mb-5">Official results and Winners from the 2024 Nascar Season.</h2>
-                        <a class="btn btn-primary" href="#about">See Winners</a>
+                        <h1 class="mx-auto my-0 text-uppercase">36 for 36</h1>
+                        <h2 class="text-white-50 mx-auto mt-2 mb-5">Results and stadnings for my entry in Nascar.com's 36 for 36 contest.</h2>
+                        <a class="btn btn-primary" href="#about">See Results</a>
                     </div>
                 </div>
             </div>
@@ -52,10 +52,15 @@
             <div class="container px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
                     <div class="col-lg-8">
-
+                        <h2 class="text-white mb-4">Nascar 36 for 36</h2>
+                        <p class="text-white-50">
+                            The first reason why I created this site was to track my own results of Nascar.com's 36 for 36 contest.
+                            You can find a link to the original article <a href="https://www.nascar.com/news-media/2024/02/16/nascar-survivor-pool-how-were-playing-36-for-36-this-season/">here.</a>
+                            My results so far can be found <a href="nascar36f36.html">at this link.</a>
+                        </p>
                     </div>
                 </div>
-                <img class="img-fluid" src="assets/img/nascarindexbw.png" alt="..." />
+                <img class="img-fluid" src="assets/img/36f36indexbw.png" alt="..." />
             </div>
         </section>
         <!-- Projects-->
@@ -67,34 +72,37 @@
                             <thead>
                               <tr>
                                 <th scope="col">Race</th>
-                                <th scope="col">Track</th>
+                                <th scoope="col">Track</th>
                                 <th scope="col">Location</th>
-                                <th scope="col">Driver</th>
-                                <th scope="col">Team</th>
-                                <th scope="col">Manufacturer</th>
+                                <th scope="col">Driver Name</th>
+                                <th scope="col">Finising Position</th>
                                 <th scope="col">Total Points</th>
                               </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="raceResults">
                               <tr>
                                 <th scope="row">Daytona 500</th>
                                 <td>Daytona Int'l Speedway</td>
                                 <td>Daytona, Fl</td>
-                                <td>William Byron</td>
-                                <td>Hendrick Motorsports</td>
-                                <td>Chevrolet</td>
-                                <td>Chevrolet</td>
+                                <td>Christopher Bell</td>
+                                <td>3rd</td>
+                                <td>34</td>
                               </tr>
                               <tr>
                                 <th scope="row">Ambetter Health 400</th>
                                 <td>Atlanta Motor Speedway</td>
-                                <td>Atlanta, Ga</td>
-                                <td>Daniel Suarez</td>
-                                <td>Trackhouse Racing</td>
-                                <td>Chevrolet</td>
-                                <td>Chevrolet</td>
+                                <td>Attlanta, GA</td>
+                                <td>Brad Keselowski</td>
+                                <td>33rd</td>
+                                <td>8</td>
                               </tr>
                             </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="5" style="text-align: right;">Total Points:</td>
+                                    <td id="totalPoints">0</td>
+                                </tr>
+                            </tfoot>
                           </table>
                     </div>
                 </div>
@@ -132,55 +140,55 @@
         <section class="signup-section" id="signup">
             <div class="container px-4 px-lg-5">
                 <div class="row gx-4 gx-lg-5">
-                    <table class="table table-dark table-striped">
+                    <table class="table table-dark table-striped" id="thirtySixPic">
                         <tbody>
                           <tr>
-                            <th scope="row"><img src="/assets/img/2424.png"/></th>
-                            <td><img src="/assets/img/9924.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
+                            <th scope="row"><img src="assets/img/0124.png"/></th>
+                            <td><img src="assets/img/0224.png"/></td>
+                            <td><img src="assets/img/0324.png"/></td>
+                            <td><img src="assets/img/0424.png"/></td>
+                            <td><img src="assets/img/0524.png"/></td>
+                            <td><img src="assets/img/0624X.png"/></td>
                           </tr>
                           <tr>
-                            <th scope="row"><img src="/assets/img/nascar.png"/></th>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
+                            <th scope="row"><img src="assets/img/0724.png"/></th>
+                            <td><img src="assets/img/0824.png"/></td>
+                            <td><img src="assets/img/0924.png"/></td>
+                            <td><img src="assets/img/1024.png"/></td>
+                            <td><img src="assets/img/1124.png"/></td>
+                            <td><img src="assets/img/1224.png"/></td>
                           </tr>
                           <tr>
-                            <th scope="row"><img src="/assets/img/nascar.png"/></th>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
+                            <th scope="row"><img src="assets/img/1424.png"/></th>
+                            <td><img src="assets/img/1524.png"/></td>
+                            <td><img src="assets/img/1624.png"/></td>
+                            <td><img src="assets/img/1724.png"/></td>
+                            <td><img src="assets/img/1924.png"/></td>
+                            <td><img src="assets/img/2024X.png"/></td>
                           </tr>
                           <tr>
-                                <th scope="row"><img src="/assets/img/nascar.png"/></th>
-                                <td><img src="/assets/img/nascar.png"/></td>
-                                <td><img src="/assets/img/nascar.png"/></td>
-                                <td><img src="/assets/img/nascar.png"/></td>
-                                <td><img src="/assets/img/nascar.png"/></td>
-                                <td><img src="/assets/img/nascar.png"/></td>
+                            <th scope="row"><img src="assets/img/2124.png"/></th>
+                            <td><img src="assets/img/2224.png"/></td>
+                            <td><img src="assets/img/2324.png"/></td>
+                            <td><img src="assets/img/2424.png"/></td>
+                            <td><img src="assets/img/3124.png"/></td>
+                            <td><img src="assets/img/3424.png"/></td>
                           </tr>
                           <tr>
-                            <th scope="row"><img src="/assets/img/nascar.png"/></th>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
+                            <th scope="row"><img src="assets/img/3824.png"/></th>
+                            <td><img src="assets/img/4124.png"/></td>
+                            <td><img src="assets/img/4224.png"/></td>
+                            <td><img src="assets/img/4324.png"/></td>
+                            <td><img src="assets/img/4524.png"/></td>
+                            <td><img src="assets/img/4724.png"/></td>
                           </tr>
                           <tr>
-                            <th scope="row"><img src="/assets/img/nascar.png"/></th>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
-                            <td><img src="/assets/img/nascar.png"/></td>
+                            <th scope="row"><img src="assets/img/4824.png"/></th>
+                            <td><img src="assets/img/5124.png"/></td>
+                            <td><img src="assets/img/5424.png"/></td>
+                            <td><img src="assets/img/7124.png"/></td>
+                            <td><img src="assets/img/7724.png"/></td>
+                            <td><img src="assets/img/9924.png"/></td>
                           </tr>
                         </tbody>
                       </table>
@@ -242,5 +250,27 @@
         <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
         <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
         <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Get the table body element
+                var tableBody = document.getElementById("raceResults");
+                var totalPointsCell = document.getElementById("totalPoints");
+        
+                // Initialize total points
+                var totalPoints = 0;
+        
+                // Loop through each row in the table body
+                for (var i = 0; i < tableBody.rows.length; i++) {
+                    // Get the points from the last cell of each row
+                    var points = parseInt(tableBody.rows[i].cells[5].textContent);
+                    // Add points to total
+                    totalPoints += points;
+                }
+        
+                // Update the total points cell
+                totalPointsCell.textContent = totalPoints;
+            });
+        </script>
+        
     </body>
 </html>
