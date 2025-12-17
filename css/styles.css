@@ -46,9 +46,19 @@ body {
 /* ============================================================
    3) Navbar (Grayscale behavior)
    ============================================================ */
+/* ============================================================
+   3) Navbar (always visible + home special-case)
+   ============================================================ */
 #mainNav {
   min-height: 3.5rem;
-  background-color: lightgrey;
+  background-color: #fff;
+  box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.08);
+  z-index: 1035; /* extra-safe over hero */
+}
+
+#mainNav .navbar-brand,
+#mainNav .nav-link {
+  color: #000 !important;
 }
 
 #mainNav .navbar-toggler {
@@ -62,91 +72,38 @@ body {
   outline: none;
 }
 
-#mainNav .navbar-brand {
-  color: #000;
-  font-weight: 700;
-  padding: 0.9rem 0;
-}
-
-#mainNav .navbar-nav .nav-item:hover,
-#mainNav .navbar-nav .nav-item:active,
-#mainNav .navbar-nav .nav-item:focus {
-  outline: none;
-  background-color: transparent;
-}
-
-@media (min-width: 992px) {
-  /* DEFAULT: visible navbar everywhere */
-  #mainNav {
-    background-color: #fff;
-    transition: background-color 0.3s ease-in-out;
-  }
-
-  #mainNav .navbar-brand,
-  #mainNav .nav-link {
-    color: #000;
-  }
-
-  #mainNav .nav-link {
-    padding: 1.5rem 1.25rem;
-    white-space: nowrap;
-  }
-
-  #mainNav .nav-link:hover {
-    color: var(--yt-accent);
-  }
-
-  /* HOME PAGE ONLY: transparent over hero */
-  body.home #mainNav {
-    background-color: transparent;
-  }
-
-  body.home #mainNav .navbar-brand,
-  body.home #mainNav .nav-link {
-    color: var(--yt-white-50);
-  }
-
-  body.home #mainNav .nav-link:hover {
-    color: var(--yt-white-75);
-  }
-
-  /* Shrink state */
-  #mainNav.navbar-shrink {
-    background-color: #fff;
-  }
-
-  #mainNav.navbar-shrink .navbar-brand,
-  #mainNav.navbar-shrink .nav-link {
-    color: #000;
-  }
-
-  #mainNav.navbar-shrink .nav-link.active {
-    color: var(--yt-accent);
-    border-bottom: 0.25rem solid var(--yt-accent);
-  }
-}
-
-
-  /* Shrink behavior (scrolling) */
-  #mainNav.navbar-shrink {
-    background-color: #fff;
-  }
-
-  #mainNav.navbar-shrink .navbar-brand,
-  #mainNav.navbar-shrink .nav-link {
-    color: #000;
-  }
-
-  #mainNav.navbar-shrink .nav-link.active {
-    color: var(--yt-accent);
-    border-bottom: 0.25rem solid var(--yt-accent);
-  }
-}
-
-/* Prevent navbar links from wrapping */
+/* Prevent wrapping anywhere */
 #mainNav .nav-link {
   white-space: nowrap;
 }
+
+/* HOME: if you still want a “hero-style” nav, keep it readable */
+body.home #mainNav {
+  background-color: rgba(255, 255, 255, 0.90);
+}
+
+/* Desktop spacing */
+@media (min-width: 992px) {
+  #mainNav .nav-link {
+    padding: 1.25rem 1.25rem;
+  }
+}
+
+/* Shrink behavior (if scripts.js toggles navbar-shrink) */
+#mainNav.navbar-shrink {
+  background-color: #fff;
+}
+
+#mainNav.navbar-shrink .navbar-brand,
+#mainNav.navbar-shrink .nav-link {
+  color: #000 !important;
+}
+
+#mainNav.navbar-shrink .nav-link.active {
+  color: var(--yt-accent) !important;
+  border-bottom: 0.25rem solid var(--yt-accent);
+}
+
 
 
 /* ============================================================
