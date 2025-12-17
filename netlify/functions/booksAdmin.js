@@ -1,19 +1,12 @@
 const { neon } = require("@neondatabase/serverless");
 
 function json(statusCode, data) {
-  return {
-    statusCode,
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(data),
-  };
+  return { statusCode, headers: { "content-type": "application/json" }, body: JSON.stringify(data) };
 }
 
 function isAuthed(event) {
-  const token =
-    event.headers?.["x-admin-token"] ||
-    event.headers?.["X-Admin-Token"] ||
-    event.headers?.["x-admin-token".toLowerCase()];
-
+  const h = event.headers || {};
+  const token = h["x-admin-token"] || h["X-Admin-Token"];
   return token && process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN;
 }
 
@@ -30,8 +23,8 @@ exports.handler = async (event) => {
     if (method === "POST") {
       const b = JSON.parse(event.body || "{}");
       const rows = await sql`
-        insert into books (title, author, genre, year_published, format, notes)
-        values (${b.title}, ${b.author}, ${b.genre}, ${b.year_published}, ${b.format}, ${b.notes})
+        insert into books (title, author, genre, year_published, format, notes, image_url, image_alt)
+        values (${b.title}, ${b.author}, ${b.genre}, ${b.year_published}, ${b.format}, ${b.notes}, ${b.image_url}, ${b.image_alt})
         returning *
       `;
       return json(200, rows[0]);
@@ -49,7 +42,9 @@ exports.handler = async (event) => {
           genre = ${b.genre},
           year_published = ${b.year_published},
           format = ${b.format},
-          notes = ${b.notes}
+          notes = ${b.notes},
+          image_url = ${b.image_url},
+          image_alt = ${b.image_alt}
         where id = ${b.id}
         returning *
       `;

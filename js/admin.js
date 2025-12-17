@@ -10,24 +10,12 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function setOk(msg) {
-  const el = $("#messages");
-  if (el) el.textContent = msg || "";
-}
-function setErr(msg) {
-  const el = $("#error");
-  if (el) el.textContent = msg || "";
-}
+function setOk(msg) { $("#messages").textContent = msg || ""; }
+function setErr(msg) { $("#error").textContent = msg || ""; }
 
-function getToken() {
-  return sessionStorage.getItem("ADMIN_TOKEN") || "";
-}
-function setToken(t) {
-  sessionStorage.setItem("ADMIN_TOKEN", t);
-}
-function clearToken() {
-  sessionStorage.removeItem("ADMIN_TOKEN");
-}
+function getToken() { return sessionStorage.getItem("ADMIN_TOKEN") || ""; }
+function setToken(t) { sessionStorage.setItem("ADMIN_TOKEN", t); }
+function clearToken() { sessionStorage.removeItem("ADMIN_TOKEN"); }
 
 async function fetchJson(url) {
   const res = await fetch(url, { headers: { accept: "application/json" } });
@@ -51,15 +39,9 @@ async function adminRequest(url, method, bodyObj) {
 
   const text = await res.text();
   let data;
-  try {
-    data = JSON.parse(text);
-  } catch {
-    data = { raw: text };
-  }
+  try { data = JSON.parse(text); } catch { data = { raw: text }; }
 
-  if (!res.ok) {
-    throw new Error(`${method} failed (${res.status}): ${JSON.stringify(data)}`);
-  }
+  if (!res.ok) throw new Error(`${method} failed (${res.status}): ${JSON.stringify(data)}`);
   return data;
 }
 
@@ -78,6 +60,8 @@ const config = {
       ["finish_pos", "Finish"],
       ["points", "Points"],
       ["notes", "Notes"],
+      ["image_url", "Image URL"],
+      ["image_alt", "Image Alt"],
     ],
     formFields: [
       ["id", "ID (for edit)", "number", "span-3"],
@@ -90,6 +74,8 @@ const config = {
       ["location", "Location", "text", "span-6"],
       ["points", "Points", "number", "span-3"],
       ["notes", "Notes", "textarea", "span-12"],
+      ["image_url", "Image URL", "text", "span-6"],
+      ["image_alt", "Image Alt Text", "text", "span-6"],
     ],
     seasonRequired: true,
   },
@@ -107,6 +93,8 @@ const config = {
       ["winner", "Winner"],
       ["team", "Team"],
       ["manufacturer", "Manufacturer"],
+      ["image_url", "Image URL"],
+      ["image_alt", "Image Alt"],
     ],
     formFields: [
       ["id", "ID (for edit)", "number", "span-3"],
@@ -118,6 +106,8 @@ const config = {
       ["location", "Location", "text", "span-6"],
       ["team", "Team", "text", "span-6"],
       ["manufacturer", "Manufacturer", "text", "span-6"],
+      ["image_url", "Image URL", "text", "span-6"],
+      ["image_alt", "Image Alt Text", "text", "span-6"],
     ],
     seasonRequired: true,
   },
@@ -133,6 +123,8 @@ const config = {
       ["location", "Location"],
       ["winner", "Winner"],
       ["score", "Score"],
+      ["image_url", "Image URL"],
+      ["image_alt", "Image Alt"],
     ],
     formFields: [
       ["id", "ID (for edit)", "number", "span-3"],
@@ -142,6 +134,8 @@ const config = {
       ["course", "Course", "text", "span-6"],
       ["location", "Location", "text", "span-6"],
       ["score", "Score", "text", "span-6"],
+      ["image_url", "Image URL", "text", "span-6"],
+      ["image_alt", "Image Alt Text", "text", "span-6"],
     ],
     seasonRequired: true,
   },
@@ -157,6 +151,8 @@ const config = {
       ["year_published", "Year"],
       ["format", "Format"],
       ["notes", "Notes"],
+      ["image_url", "Image URL"],
+      ["image_alt", "Image Alt"],
     ],
     formFields: [
       ["id", "ID (for edit)", "number", "span-3"],
@@ -166,6 +162,8 @@ const config = {
       ["year_published", "Year", "number", "span-3"],
       ["format", "Format", "text", "span-6"],
       ["notes", "Notes", "textarea", "span-12"],
+      ["image_url", "Image URL", "text", "span-6"],
+      ["image_alt", "Image Alt Text", "text", "span-6"],
     ],
     seasonRequired: false,
   },
@@ -200,10 +198,10 @@ function buildForm(datasetKey) {
       </div>
 
       <div class="actions mt-3">
-        <button id="btnCreate" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Create</button>
-        <button id="btnUpdate" class="btn btn-primary"><i class="fa-solid fa-pen-to-square me-2"></i>Update</button>
-        <button id="btnDelete" class="btn btn-outline-danger"><i class="fa-solid fa-trash me-2"></i>Delete</button>
-        <button id="btnClear" class="btn btn-outline-secondary"><i class="fa-solid fa-broom me-2"></i>Clear</button>
+        <button id="btnCreate" class="btn btn-primary">Create</button>
+        <button id="btnUpdate" class="btn btn-primary">Update</button>
+        <button id="btnDelete" class="btn btn-outline-danger">Delete</button>
+        <button id="btnClear" class="btn btn-outline-secondary">Clear</button>
       </div>
 
       <div class="muted mt-2">
@@ -234,9 +232,7 @@ function getFormValue(key, type) {
 function getPayload(datasetKey) {
   const cfg = config[datasetKey];
   const payload = {};
-  for (const [key, _label, type] of cfg.formFields) {
-    payload[key] = getFormValue(key, type);
-  }
+  for (const [key, _label, type] of cfg.formFields) payload[key] = getFormValue(key, type);
   return payload;
 }
 
@@ -281,7 +277,6 @@ function renderTable(datasetKey, rows) {
     </tr>
   `).join("");
 
-  // Wire row buttons
   $("#tbody").querySelectorAll("button[data-edit]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = Number(btn.getAttribute("data-edit"));
@@ -296,7 +291,6 @@ function renderTable(datasetKey, rows) {
       try {
         const id = Number(btn.getAttribute("data-del"));
         if (!confirm(`Delete id ${id}?`)) return;
-
         await adminRequest(cfg.write, "DELETE", { id });
         setOk(`Deleted id ${id}`);
         setErr("");
@@ -310,8 +304,7 @@ function renderTable(datasetKey, rows) {
 
 async function doWrite(method) {
   try {
-    setOk("");
-    setErr("");
+    setOk(""); setErr("");
 
     const datasetKey = $("#dataset").value;
     const cfg = config[datasetKey];
@@ -320,15 +313,12 @@ async function doWrite(method) {
     if (cfg.seasonRequired && (payload.season_year == null || payload.season_year === "")) {
       throw new Error("season_year is required for this dataset.");
     }
-
     if ((method === "PUT" || method === "DELETE") && !payload.id) {
       throw new Error("id is required for Update/Delete.");
     }
 
     const result = await adminRequest(cfg.write, method, payload);
     setOk(`${method} OK: ${JSON.stringify(result)}`);
-    setErr("");
-
     await loadRows();
   } catch (e) {
     setErr(e.message || String(e));
@@ -337,8 +327,7 @@ async function doWrite(method) {
 
 async function loadRows() {
   try {
-    setOk("");
-    setErr("");
+    setOk(""); setErr("");
 
     const datasetKey = $("#dataset").value;
     const cfg = config[datasetKey];
@@ -349,12 +338,9 @@ async function loadRows() {
       $("#seasonFilter").value = season;
     }
 
-    const url = cfg.read(season);
-    const rows = await fetchJson(url);
-
+    const rows = await fetchJson(cfg.read(season));
     buildForm(datasetKey);
     renderTable(datasetKey, rows);
-
     setOk(`Loaded ${rows.length} row(s).`);
   } catch (e) {
     setErr(e.message || String(e));
@@ -362,7 +348,6 @@ async function loadRows() {
 }
 
 (function init() {
-  // Token UI
   $("#token").value = getToken();
 
   $("#saveToken").addEventListener("click", () => {
@@ -378,20 +363,15 @@ async function loadRows() {
     setErr("");
   });
 
-  // Top clear form button
   const clearTop = $("#clearFormTop");
   if (clearTop) clearTop.addEventListener("click", clearForm);
 
-  // Dataset change
   $("#dataset").addEventListener("change", () => {
     buildForm($("#dataset").value);
     $("#tbody").innerHTML = "";
     $("#thead").innerHTML = "";
   });
 
-  // Load button
   $("#load").addEventListener("click", loadRows);
-
-  // Initial form
   buildForm($("#dataset").value);
 })();

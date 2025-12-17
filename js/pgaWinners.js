@@ -10,6 +10,13 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function imgCell(url, alt) {
+  if (!url) return "";
+  const safeUrl = escapeHtml(url);
+  const safeAlt = escapeHtml(alt || "");
+  return `<img src="${safeUrl}" alt="${safeAlt}" style="height:48px;border-radius:8px;object-fit:cover;" loading="lazy">`;
+}
+
 function buildSeasonOptions(seasons, selected) {
   $("#season").innerHTML = seasons
     .map((y) => `<option value="${y}" ${String(y) === String(selected) ? "selected" : ""}>${y}</option>`)
@@ -17,37 +24,31 @@ function buildSeasonOptions(seasons, selected) {
 }
 
 async function fetchJson(url) {
-  const res = await fetch(url, { headers: { "accept": "application/json" } });
+  const res = await fetch(url, { headers: { accept: "application/json" } });
   if (!res.ok) throw new Error(`Request failed (${res.status})`);
   return res.json();
 }
 
-function renderRows(rows) {
-  const tbody = $("#rows");
-  tbody.innerHTML = rows
-    .map(
-      (r) => `
-      <tr>
-        <td>${escapeHtml(r.event_name)}</td>
-        <td>${escapeHtml(r.course)}</td>
-        <td>${escapeHtml(r.location)}</td>
-        <td>${escapeHtml(r.winner)}</td>
-        <td>${escapeHtml(r.score)}</td>
-      </tr>
-    `
-    )
-    .join("");
+function render(rows) {
+  $("#rows").innerHTML = rows.map(r => `
+    <tr>
+      <td>${imgCell(r.image_url, r.image_alt)}</td>
+      <td>${escapeHtml(r.event_name)}</td>
+      <td>${escapeHtml(r.course)}</td>
+      <td>${escapeHtml(r.location)}</td>
+      <td>${escapeHtml(r.winner)}</td>
+      <td>${escapeHtml(r.score)}</td>
+    </tr>
+  `).join("");
 }
 
 async function load() {
   try {
     $("#error").textContent = "";
-
     const season = $("#season").value;
-    const data = await fetchJson(`/.netlify/functions/pgaWinners?season=${encodeURIComponent(season)}`);
-
-    renderRows(data);
-    $("#count").textContent = `${data.length} rows`;
+    const rows = await fetchJson(`/.netlify/functions/pgaWinners?season=${encodeURIComponent(season)}`);
+    render(rows);
+    $("#count").textContent = `${rows.length} rows`;
   } catch (e) {
     $("#error").textContent = e.message || String(e);
   }
@@ -56,7 +57,6 @@ async function load() {
 (function init() {
   const seasons = [2026, 2025, 2024, 2023, 2022];
   buildSeasonOptions(seasons, seasons[0]);
-
   $("#season").addEventListener("change", load);
   load();
 })();

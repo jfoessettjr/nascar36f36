@@ -1,19 +1,12 @@
 const { neon } = require("@neondatabase/serverless");
 
 function json(statusCode, data) {
-  return {
-    statusCode,
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(data),
-  };
+  return { statusCode, headers: { "content-type": "application/json" }, body: JSON.stringify(data) };
 }
 
 function isAuthed(event) {
-  const token =
-    event.headers?.["x-admin-token"] ||
-    event.headers?.["X-Admin-Token"] ||
-    event.headers?.["x-admin-token".toLowerCase()];
-
+  const h = event.headers || {};
+  const token = h["x-admin-token"] || h["X-Admin-Token"];
   return token && process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN;
 }
 
@@ -30,8 +23,11 @@ exports.handler = async (event) => {
     if (method === "POST") {
       const b = JSON.parse(event.body || "{}");
       const rows = await sql`
-        insert into nascar_winners (season_year, race_num, race_name, track, location, winner, team, manufacturer)
-        values (${b.season_year}, ${b.race_num}, ${b.race_name}, ${b.track}, ${b.location}, ${b.winner}, ${b.team}, ${b.manufacturer})
+        insert into nascar_winners
+          (season_year, race_num, race_name, track, location, winner, team, manufacturer, image_url, image_alt)
+        values
+          (${b.season_year}, ${b.race_num}, ${b.race_name}, ${b.track}, ${b.location},
+           ${b.winner}, ${b.team}, ${b.manufacturer}, ${b.image_url}, ${b.image_alt})
         returning *
       `;
       return json(200, rows[0]);
@@ -51,7 +47,9 @@ exports.handler = async (event) => {
           location = ${b.location},
           winner = ${b.winner},
           team = ${b.team},
-          manufacturer = ${b.manufacturer}
+          manufacturer = ${b.manufacturer},
+          image_url = ${b.image_url},
+          image_alt = ${b.image_alt}
         where id = ${b.id}
         returning *
       `;
@@ -71,3 +69,4 @@ exports.handler = async (event) => {
     return json(500, { error: String(err) });
   }
 };
+

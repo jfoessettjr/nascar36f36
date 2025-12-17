@@ -1,11 +1,7 @@
 const { neon } = require("@neondatabase/serverless");
 
 function json(statusCode, data) {
-  return {
-    statusCode,
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(data),
-  };
+  return { statusCode, headers: { "content-type": "application/json" }, body: JSON.stringify(data) };
 }
 
 exports.handler = async () => {
@@ -16,7 +12,7 @@ exports.handler = async () => {
     const sql = neon(conn);
 
     const rows = await sql`
-      select id, title, author, genre, year_published, format, notes
+      select id, title, author, genre, year_published, format, notes, image_url, image_alt
       from books
       order by title asc, id
     `;
