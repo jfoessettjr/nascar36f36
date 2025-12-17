@@ -40,19 +40,20 @@ exports.handler = async (event) => {
       const rows = await sql`
         update nascar_winners
         set
-          season_year = ${b.season_year},
-          race_num = ${b.race_num},
-          race_name = ${b.race_name},
-          track = ${b.track},
-          location = ${b.location},
-          winner = ${b.winner},
-          team = ${b.team},
-          manufacturer = ${b.manufacturer},
-          image_url = ${b.image_url},
-          image_alt = ${b.image_alt}
+          season_year = coalesce(${b.season_year}, season_year),
+          race_num = coalesce(${b.race_num}, race_num),
+          race_name = coalesce(${b.race_name}, race_name),
+          track = coalesce(${b.track}, track),
+          location = coalesce(${b.location}, location),
+          winner = coalesce(${b.winner}, winner),
+          team = coalesce(${b.team}, team),
+          manufacturer = coalesce(${b.manufacturer}, manufacturer),
+          image_url = coalesce(${b.image_url}, image_url),
+          image_alt = coalesce(${b.image_alt}, image_alt)
         where id = ${b.id}
         returning *
       `;
+
       return json(200, rows[0] || null);
     }
 
