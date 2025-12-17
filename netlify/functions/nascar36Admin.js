@@ -1,10 +1,5 @@
 const { neon } = require("@neondatabase/serverless");
 
-function isAuthed(event) {
-  const token = event.headers?.["x-admin-token"] || event.headers?.["X-Admin-Token"];
-  return token && process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN;
-}
-
 function json(statusCode, data) {
   return {
     statusCode,
@@ -13,23 +8,30 @@ function json(statusCode, data) {
   };
 }
 
+function isAuthed(event) {
+  const token =
+    event.headers?.["x-admin-token"] ||
+    event.headers?.["X-Admin-Token"] ||
+    event.headers?.["x-admin-token".toLowerCase()];
+
+  return token && process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN;
+}
+
 exports.handler = async (event) => {
   try {
-    if (!process.env.DATABASE_URL) return json(500, { error: "Missing DATABASE_URL" });
+    const conn = process.env.NETLIFY_DATABASE_URL || process.env.DATABASE_URL;
+    if (!conn) return json(500, { error: "Missing DB connection env var" });
     if (!process.env.ADMIN_TOKEN) return json(500, { error: "Missing ADMIN_TOKEN" });
     if (!isAuthed(event)) return json(401, { error: "Unauthorized" });
 
-    const sql = neon(process.env.DATABASE_URL);
+    const sql = neon(conn);
     const method = event.httpMethod;
 
     if (method === "POST") {
       const b = JSON.parse(event.body || "{}");
       const rows = await sql`
         insert into nascar_36 (season_year, race_num, race_name, track, location, driver, finish_pos, points, notes)
-        values (
-          ${b.season_year}, ${b.race_num}, ${b.race_name}, ${b.track}, ${b.location},
-          ${b.driver}, ${b.finish_pos}, ${b.points}, ${b.notes}
-        )
+        values (${b.season_year}, ${b.race_num}, ${b.race_name}, ${b.track}, ${b.location}, ${b.driver}, ${b.finish_pos}, ${b.points}, ${b.notes})
         returning *
       `;
       return json(200, rows[0]);
