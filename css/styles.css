@@ -130,6 +130,11 @@ body {
   }
 }
 
+/* Prevent navbar links from wrapping */
+#mainNav .nav-link {
+  white-space: nowrap;
+}
+
 
 /* ============================================================
    4) Buttons
