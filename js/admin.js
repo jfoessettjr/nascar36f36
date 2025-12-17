@@ -155,6 +155,51 @@ const config = {
     ],
     seasonRequired: false,
   },
+  videoGames: {
+  read: () => "/.netlify/functions/videoGames",
+  write: "/.netlify/functions/videoGamesAdmin",
+  columns: [
+    ["id","ID"],["title","Title"],["platform","Platform"],["status","Status"],
+    ["hours_played","Hours"],["rating","Rating"],["year_released","Year"],["notes","Notes"],
+    ["image_url","Image URL"],["image_alt","Image Alt"],
+  ],
+  formFields: [
+    ["id","ID (for edit)","number","span-3"],
+    ["title","Title","text","span-6"],
+    ["platform","Platform","text","span-6"],
+    ["status","Status","text","span-6"],
+    ["hours_played","Hours Played","number","span-3"],
+    ["rating","Rating","number","span-3"],
+    ["year_released","Year Released","number","span-3"],
+    ["notes","Notes","textarea","span-12"],
+    ["image_url","Image URL","text","span-6"],
+    ["image_alt","Image Alt Text","text","span-6"],
+  ],
+  seasonRequired: false,
+},
+
+vinylRecords: {
+  read: () => "/.netlify/functions/vinylRecords",
+  write: "/.netlify/functions/vinylRecordsAdmin",
+  columns: [
+    ["id","ID"],["artist","Artist"],["album","Album"],["year_released","Year"],
+    ["genre","Genre"],["label","Label"],["condition","Condition"],["notes","Notes"],
+    ["image_url","Image URL"],["image_alt","Image Alt"],
+  ],
+  formFields: [
+    ["id","ID (for edit)","number","span-3"],
+    ["artist","Artist","text","span-6"],
+    ["album","Album","text","span-6"],
+    ["year_released","Year Released","number","span-3"],
+    ["genre","Genre","text","span-6"],
+    ["label","Label","text","span-6"],
+    ["condition","Condition","text","span-6"],
+    ["notes","Notes","textarea","span-12"],
+    ["image_url","Image URL","text","span-6"],
+    ["image_alt","Image Alt Text","text","span-6"],
+  ],
+  seasonRequired: false,
+},
 };
 
 function getFormValue(key, type) {
