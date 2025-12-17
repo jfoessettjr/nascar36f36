@@ -10,8 +10,8 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function setOk(msg) { $("#messages").textContent = msg || ""; }
-function setErr(msg) { $("#error").textContent = msg || ""; }
+function setOk(msg) { const el = $("#messages"); if (el) el.textContent = msg || ""; }
+function setErr(msg) { const el = $("#error"); if (el) el.textContent = msg || ""; }
 
 function getToken() { return sessionStorage.getItem("ADMIN_TOKEN") || ""; }
 function setToken(t) { sessionStorage.setItem("ADMIN_TOKEN", t); }
@@ -19,8 +19,11 @@ function clearToken() { sessionStorage.removeItem("ADMIN_TOKEN"); }
 
 async function fetchJson(url) {
   const res = await fetch(url, { headers: { accept: "application/json" } });
-  if (!res.ok) throw new Error(`GET failed (${res.status})`);
-  return res.json();
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = { raw: text }; }
+  if (!res.ok) throw new Error(data?.error || `Request failed (${res.status})`);
+  return data;
 }
 
 async function adminRequest(url, method, bodyObj) {
@@ -45,23 +48,28 @@ async function adminRequest(url, method, bodyObj) {
   return data;
 }
 
+/** Cloudinary widget config loaded from Netlify function */
+let CLOUDINARY = null;
+async function loadCloudinaryConfig() {
+  if (CLOUDINARY) return CLOUDINARY;
+  try {
+    CLOUDINARY = await fetchJson("/.netlify/functions/cloudinaryConfig");
+    return CLOUDINARY;
+  } catch (e) {
+    // Not fatal (admin can still paste URLs manually)
+    CLOUDINARY = { error: e.message || String(e) };
+    return CLOUDINARY;
+  }
+}
+
 const config = {
   nascar36: {
     read: (season) => `/.netlify/functions/nascar36?season=${encodeURIComponent(season || "")}`,
     write: "/.netlify/functions/nascar36Admin",
     columns: [
-      ["id", "ID"],
-      ["season_year", "Season"],
-      ["race_num", "Race #"],
-      ["race_name", "Race"],
-      ["track", "Track"],
-      ["location", "Location"],
-      ["driver", "Driver"],
-      ["finish_pos", "Finish"],
-      ["points", "Points"],
-      ["notes", "Notes"],
-      ["image_url", "Image URL"],
-      ["image_alt", "Image Alt"],
+      ["id", "ID"], ["season_year", "Season"], ["race_num", "Race #"], ["race_name", "Race"],
+      ["track", "Track"], ["location", "Location"], ["driver", "Driver"], ["finish_pos", "Finish"],
+      ["points", "Points"], ["notes", "Notes"], ["image_url", "Image URL"], ["image_alt", "Image Alt"],
     ],
     formFields: [
       ["id", "ID (for edit)", "number", "span-3"],
@@ -84,17 +92,9 @@ const config = {
     read: (season) => `/.netlify/functions/nascarWinners?season=${encodeURIComponent(season || "")}`,
     write: "/.netlify/functions/nascarWinnersAdmin",
     columns: [
-      ["id", "ID"],
-      ["season_year", "Season"],
-      ["race_num", "Race #"],
-      ["race_name", "Race"],
-      ["track", "Track"],
-      ["location", "Location"],
-      ["winner", "Winner"],
-      ["team", "Team"],
-      ["manufacturer", "Manufacturer"],
-      ["image_url", "Image URL"],
-      ["image_alt", "Image Alt"],
+      ["id", "ID"], ["season_year", "Season"], ["race_num", "Race #"], ["race_name", "Race"],
+      ["track", "Track"], ["location", "Location"], ["winner", "Winner"], ["team", "Team"],
+      ["manufacturer", "Manufacturer"], ["image_url", "Image URL"], ["image_alt", "Image Alt"],
     ],
     formFields: [
       ["id", "ID (for edit)", "number", "span-3"],
@@ -116,15 +116,9 @@ const config = {
     read: (season) => `/.netlify/functions/pgaWinners?season=${encodeURIComponent(season || "")}`,
     write: "/.netlify/functions/pgaWinnersAdmin",
     columns: [
-      ["id", "ID"],
-      ["season_year", "Season"],
-      ["event_name", "Event"],
-      ["course", "Course"],
-      ["location", "Location"],
-      ["winner", "Winner"],
-      ["score", "Score"],
-      ["image_url", "Image URL"],
-      ["image_alt", "Image Alt"],
+      ["id", "ID"], ["season_year", "Season"], ["event_name", "Event"], ["course", "Course"],
+      ["location", "Location"], ["winner", "Winner"], ["score", "Score"],
+      ["image_url", "Image URL"], ["image_alt", "Image Alt"],
     ],
     formFields: [
       ["id", "ID (for edit)", "number", "span-3"],
@@ -144,15 +138,9 @@ const config = {
     read: () => "/.netlify/functions/books",
     write: "/.netlify/functions/booksAdmin",
     columns: [
-      ["id", "ID"],
-      ["title", "Title"],
-      ["author", "Author"],
-      ["genre", "Genre"],
-      ["year_published", "Year"],
-      ["format", "Format"],
-      ["notes", "Notes"],
-      ["image_url", "Image URL"],
-      ["image_alt", "Image Alt"],
+      ["id", "ID"], ["title", "Title"], ["author", "Author"], ["genre", "Genre"],
+      ["year_published", "Year"], ["format", "Format"], ["notes", "Notes"],
+      ["image_url", "Image URL"], ["image_alt", "Image Alt"],
     ],
     formFields: [
       ["id", "ID (for edit)", "number", "span-3"],
@@ -168,53 +156,6 @@ const config = {
     seasonRequired: false,
   },
 };
-
-function buildForm(datasetKey) {
-  const cfg = config[datasetKey];
-
-  const fieldsHtml = cfg.formFields.map(([key, label, type, spanClass]) => {
-    if (type === "textarea") {
-      return `
-        <div class="${spanClass}">
-          <label class="form-label" for="f_${escapeHtml(key)}">${escapeHtml(label)}</label>
-          <textarea id="f_${escapeHtml(key)}" class="form-control"></textarea>
-        </div>
-      `;
-    }
-    return `
-      <div class="${spanClass}">
-        <label class="form-label" for="f_${escapeHtml(key)}">${escapeHtml(label)}</label>
-        <input id="f_${escapeHtml(key)}" type="${escapeHtml(type)}" class="form-control" />
-      </div>
-    `;
-  }).join("");
-
-  $("#formArea").innerHTML = `
-    <div class="card-lite">
-      <h3 class="h5 mb-3">Add / Edit</h3>
-
-      <div class="form-grid">
-        ${fieldsHtml}
-      </div>
-
-      <div class="actions mt-3">
-        <button id="btnCreate" class="btn btn-primary">Create</button>
-        <button id="btnUpdate" class="btn btn-primary">Update</button>
-        <button id="btnDelete" class="btn btn-outline-danger">Delete</button>
-        <button id="btnClear" class="btn btn-outline-secondary">Clear</button>
-      </div>
-
-      <div class="muted mt-2">
-        Create = POST, Update = PUT (requires ID), Delete = DELETE (requires ID).
-      </div>
-    </div>
-  `;
-
-  $("#btnCreate").addEventListener("click", async () => doWrite("POST"));
-  $("#btnUpdate").addEventListener("click", async () => doWrite("PUT"));
-  $("#btnDelete").addEventListener("click", async () => doWrite("DELETE"));
-  $("#btnClear").addEventListener("click", clearForm);
-}
 
 function getFormValue(key, type) {
   const el = $(`#f_${key}`);
@@ -243,6 +184,7 @@ function fillFormFromRow(datasetKey, row) {
     if (!el) continue;
     el.value = row[key] == null ? "" : String(row[key]);
   }
+  refreshImagePreview();
 }
 
 function clearForm() {
@@ -252,6 +194,169 @@ function clearForm() {
     const el = $(`#f_${key}`);
     if (el) el.value = "";
   }
+  refreshImagePreview();
+}
+
+function refreshImagePreview() {
+  const urlEl = $("#f_image_url");
+  const prev = $("#imagePreview");
+  if (!urlEl || !prev) return;
+
+  const url = urlEl.value.trim();
+  if (!url) {
+    prev.innerHTML = `<div class="muted">No image selected.</div>`;
+    return;
+  }
+
+  const safe = escapeHtml(url);
+  prev.innerHTML = `
+    <img src="${safe}" alt="" style="height:96px;width:96px;border-radius:10px;object-fit:cover;" loading="lazy"
+      referrerpolicy="no-referrer" onerror="this.style.display='none';">
+    <div class="muted mt-2" style="word-break:break-all;">${safe}</div>
+  `;
+}
+
+async function openCloudinaryWidget() {
+  const cfg = await loadCloudinaryConfig();
+
+  if (!cfg || cfg.error) {
+    throw new Error(cfg?.error || "Cloudinary config not available. Check Netlify env vars and cloudinaryConfig function.");
+  }
+
+  if (!window.cloudinary || !window.cloudinary.createUploadWidget) {
+    throw new Error("Cloudinary widget script not loaded.");
+  }
+
+  const urlInput = $("#f_image_url");
+  const altInput = $("#f_image_alt");
+
+  if (!urlInput) throw new Error("image_url field not found on this form.");
+
+  return new Promise((resolve, reject) => {
+    const widget = window.cloudinary.createUploadWidget(
+      {
+        cloudName: cfg.cloudName,
+        uploadPreset: cfg.uploadPreset,
+
+        // Nice defaults:
+        sources: ["local", "url", "camera"],
+        multiple: false,
+        maxFiles: 1,
+
+        // You can enforce size/types by preset too; this is extra:
+        clientAllowedFormats: ["png", "jpg", "jpeg", "webp"],
+        maxImageFileSize: 10 * 1024 * 1024, // 10MB
+
+        folder: "ytsejammer", // optional; can be overridden in preset settings
+      },
+      (error, result) => {
+        if (error) return reject(error);
+
+        if (result && result.event === "success") {
+          const secureUrl = result.info.secure_url;
+          urlInput.value = secureUrl;
+
+          if (altInput && !altInput.value.trim()) {
+            const original = result.info.original_filename || "image";
+            altInput.value = original.replaceAll("-", " ").replaceAll("_", " ");
+          }
+
+          refreshImagePreview();
+          resolve(secureUrl);
+        }
+      }
+    );
+
+    widget.open();
+  });
+}
+
+function buildForm(datasetKey) {
+  const cfg = config[datasetKey];
+
+  const fieldsHtml = cfg.formFields.map(([key, label, type, spanClass]) => {
+    if (type === "textarea") {
+      return `
+        <div class="${spanClass}">
+          <label class="form-label" for="f_${escapeHtml(key)}">${escapeHtml(label)}</label>
+          <textarea id="f_${escapeHtml(key)}" class="form-control"></textarea>
+        </div>
+      `;
+    }
+    return `
+      <div class="${spanClass}">
+        <label class="form-label" for="f_${escapeHtml(key)}">${escapeHtml(label)}</label>
+        <input id="f_${escapeHtml(key)}" type="${escapeHtml(type)}" class="form-control" />
+      </div>
+    `;
+  }).join("");
+
+  // Add upload controls only when image_url exists on this dataset
+  const hasImageUrl = cfg.formFields.some(([k]) => k === "image_url");
+  const uploadBlock = hasImageUrl ? `
+    <div class="span-12">
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <button id="btnUploadImage" type="button" class="btn btn-outline-primary">
+          Upload Image (Cloudinary)
+        </button>
+        <button id="btnPreviewImage" type="button" class="btn btn-outline-secondary">
+          Preview
+        </button>
+        <div class="muted">Uploads go to Cloudinary and auto-fill Image URL.</div>
+      </div>
+      <div id="imagePreview" class="mt-3"></div>
+    </div>
+  ` : "";
+
+  $("#formArea").innerHTML = `
+    <div class="card-lite">
+      <h3 class="h5 mb-3">Add / Edit</h3>
+
+      <div class="form-grid">
+        ${fieldsHtml}
+        ${uploadBlock}
+      </div>
+
+      <div class="actions mt-3">
+        <button id="btnCreate" class="btn btn-primary">Create</button>
+        <button id="btnUpdate" class="btn btn-primary">Update</button>
+        <button id="btnDelete" class="btn btn-outline-danger">Delete</button>
+        <button id="btnClear" class="btn btn-outline-secondary">Clear</button>
+      </div>
+
+      <div class="muted mt-2">
+        Create = POST, Update = PUT (requires ID), Delete = DELETE (requires ID).
+      </div>
+    </div>
+  `;
+
+  $("#btnCreate").addEventListener("click", async () => doWrite("POST"));
+  $("#btnUpdate").addEventListener("click", async () => doWrite("PUT"));
+  $("#btnDelete").addEventListener("click", async () => doWrite("DELETE"));
+  $("#btnClear").addEventListener("click", clearForm);
+
+  // Wire upload buttons if present
+  const uploadBtn = $("#btnUploadImage");
+  if (uploadBtn) {
+    uploadBtn.addEventListener("click", async () => {
+      try {
+        setErr("");
+        await openCloudinaryWidget();
+        setOk("Image uploaded and Image URL filled.");
+      } catch (e) {
+        setErr(e.message || String(e));
+      }
+    });
+  }
+
+  const previewBtn = $("#btnPreviewImage");
+  if (previewBtn) previewBtn.addEventListener("click", refreshImagePreview);
+
+  // Live preview when user pastes URL
+  const urlInput = $("#f_image_url");
+  if (urlInput) urlInput.addEventListener("input", refreshImagePreview);
+
+  refreshImagePreview();
 }
 
 function renderTable(datasetKey, rows) {
@@ -318,8 +423,9 @@ async function doWrite(method) {
     }
 
     const result = await adminRequest(cfg.write, method, payload);
-    setOk(`${method} OK: ${JSON.stringify(result)}`);
+    setOk(`${method} OK`);
     await loadRows();
+    return result;
   } catch (e) {
     setErr(e.message || String(e));
   }
@@ -347,7 +453,8 @@ async function loadRows() {
   }
 }
 
-(function init() {
+(async function init() {
+  // Token UI
   $("#token").value = getToken();
 
   $("#saveToken").addEventListener("click", () => {
@@ -373,5 +480,9 @@ async function loadRows() {
   });
 
   $("#load").addEventListener("click", loadRows);
+
+  // Preload Cloudinary config (optional; errors are non-fatal)
+  await loadCloudinaryConfig();
+
   buildForm($("#dataset").value);
 })();
