@@ -75,21 +75,21 @@ body {
   background-color: transparent;
 }
 
-/* Desktop behavior */
 @media (min-width: 992px) {
-  /* DEFAULT: solid navbar (for all pages) */
+  /* DEFAULT: visible navbar everywhere */
   #mainNav {
     background-color: #fff;
     transition: background-color 0.3s ease-in-out;
   }
 
-  #mainNav .navbar-brand {
+  #mainNav .navbar-brand,
+  #mainNav .nav-link {
     color: #000;
   }
 
   #mainNav .nav-link {
-    color: #000;
-    padding: 1.5rem 1.5rem 1.25rem;
+    padding: 1.5rem 1.25rem;
+    white-space: nowrap;
   }
 
   #mainNav .nav-link:hover {
@@ -101,18 +101,31 @@ body {
     background-color: transparent;
   }
 
-  body.home #mainNav .navbar-brand {
-    color: var(--yt-white-50);
-  }
-
+  body.home #mainNav .navbar-brand,
   body.home #mainNav .nav-link {
     color: var(--yt-white-50);
-    padding: 2rem 1.5rem;
   }
 
   body.home #mainNav .nav-link:hover {
     color: var(--yt-white-75);
   }
+
+  /* Shrink state */
+  #mainNav.navbar-shrink {
+    background-color: #fff;
+  }
+
+  #mainNav.navbar-shrink .navbar-brand,
+  #mainNav.navbar-shrink .nav-link {
+    color: #000;
+  }
+
+  #mainNav.navbar-shrink .nav-link.active {
+    color: var(--yt-accent);
+    border-bottom: 0.25rem solid var(--yt-accent);
+  }
+}
+
 
   /* Shrink behavior (scrolling) */
   #mainNav.navbar-shrink {
