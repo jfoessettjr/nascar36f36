@@ -75,63 +75,61 @@ body {
   background-color: transparent;
 }
 
-/* Desktop behavior (transparent nav that becomes white on shrink) */
+/* Desktop behavior */
 @media (min-width: 992px) {
+  /* DEFAULT: solid navbar (for all pages) */
   #mainNav {
-    padding-top: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-    background-color: transparent;
+    background-color: #fff;
     transition: background-color 0.3s ease-in-out;
   }
 
   #mainNav .navbar-brand {
-    padding: 0.5rem 0;
-    color: var(--yt-white-50);
+    color: #000;
   }
 
   #mainNav .nav-link {
-    transition: none;
-    padding: 2rem 1.5rem;
-    color: var(--yt-white-50);
+    color: #000;
+    padding: 1.5rem 1.5rem 1.25rem;
   }
 
   #mainNav .nav-link:hover {
+    color: var(--yt-accent);
+  }
+
+  /* HOME PAGE ONLY: transparent over hero */
+  body.home #mainNav {
+    background-color: transparent;
+  }
+
+  body.home #mainNav .navbar-brand {
+    color: var(--yt-white-50);
+  }
+
+  body.home #mainNav .nav-link {
+    color: var(--yt-white-50);
+    padding: 2rem 1.5rem;
+  }
+
+  body.home #mainNav .nav-link:hover {
     color: var(--yt-white-75);
   }
 
-  #mainNav .nav-link:active {
-    color: #fff;
-  }
-
+  /* Shrink behavior (scrolling) */
   #mainNav.navbar-shrink {
     background-color: #fff;
   }
 
-  #mainNav.navbar-shrink .navbar-brand {
-    color: #000;
-  }
-
+  #mainNav.navbar-shrink .navbar-brand,
   #mainNav.navbar-shrink .nav-link {
     color: #000;
-    padding: 1.5rem 1.5rem 1.25rem;
-    border-bottom: 0.25rem solid transparent;
-  }
-
-  #mainNav.navbar-shrink .nav-link:hover {
-    color: var(--yt-accent);
-  }
-
-  #mainNav.navbar-shrink .nav-link:active {
-    color: var(--yt-accent-dark);
   }
 
   #mainNav.navbar-shrink .nav-link.active {
     color: var(--yt-accent);
-    outline: none;
     border-bottom: 0.25rem solid var(--yt-accent);
   }
 }
+
 
 /* ============================================================
    4) Buttons
