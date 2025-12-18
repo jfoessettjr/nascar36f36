@@ -457,3 +457,20 @@ code {
 #mainNav.nav-scrolled {
   box-shadow: 0 0.5rem 1.25rem rgba(0,0,0,0.12);
 }
+
+/* ============================================================
+   Card image sizing & cropping (Hub / Index cards)
+   ============================================================ */
+
+/* Force all card images to the same height */
+.card-img-top {
+  height: 200px;          /* adjust this number if needed */
+  width: 100%;
+  object-fit: cover;     /* fills the box, crops excess */
+  object-position: center;
+}
+
+/* Ensure card corners clip the image */
+.card {
+  overflow: hidden;
+}
