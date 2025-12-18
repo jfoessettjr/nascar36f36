@@ -417,7 +417,7 @@ code {
 /* Card images: consistent height + crop */
 .card-img-top {
   height: 200px;
-  object-fit: contain;
+  object-fit: fill;
 }
 
 /* Card body spacing */
