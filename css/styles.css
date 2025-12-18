@@ -396,3 +396,58 @@ code {
 .table-responsive thead th {
   background: #f8f9fa;
 }
+
+/* ============================================================
+   Card UI Enhancements (Index / Hub Cards)
+   ============================================================ */
+
+/* Unified card look */
+.card {
+  border-radius: 0.75rem;
+  overflow: hidden; /* ensures image corners clip */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Subtle hover lift */
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12);
+}
+
+/* Card images: consistent height + crop */
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Card body spacing */
+.card-body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Push button to bottom for uniform cards */
+.card-body .btn {
+  margin-top: auto;
+}
+
+/* Titles */
+.card-title {
+  font-weight: 600;
+}
+
+/* Text */
+.card-text {
+  font-size: 0.95rem;
+}
+
+/* Dark cards (admin callout, etc.) */
+.card.bg-black,
+.card.bg-dark {
+  color: #fff;
+}
+
+.card.bg-black .text-muted,
+.card.bg-dark .text-muted {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
