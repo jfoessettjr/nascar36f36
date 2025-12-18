@@ -458,4 +458,23 @@ code {
   box-shadow: 0 0.5rem 1.25rem rgba(0,0,0,0.12);
 }
 
+/* ============================================================
+   Button Color Overrides (Site-wide)
+   ============================================================ */
+
+.btn-primary {
+  background-color: var(--yt-accent);
+  border-color: var(--yt-accent);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--yt-accent-dark);
+  border-color: var(--yt-accent-dark);
+}
+
+.btn-primary:active {
+  background-color: var(--yt-accent-dark);
+  border-color: var(--yt-accent-dark);
+}
 
