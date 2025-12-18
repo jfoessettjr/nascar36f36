@@ -18,7 +18,10 @@ function imgCell(url, alt) {
 }
 
 function buildSeasonOptions(seasons, selected) {
-  $("#season").innerHTML = seasons
+  const seasonEl = $("#season");
+  if (!seasonEl) return;
+
+  seasonEl.innerHTML = seasons
     .map((y) => `<option value="${y}" ${String(y) === String(selected) ? "selected" : ""}>${y}</option>`)
     .join("");
 }
@@ -30,7 +33,10 @@ async function fetchJson(url) {
 }
 
 function render(rows) {
-  $("#rows").innerHTML = rows.map(r => `
+  const rowsEl = $("#rows");
+  if (!rowsEl) return;
+
+  rowsEl.innerHTML = rows.map(r => `
     <tr>
       <td>${imgCell(r.image_url, r.image_alt)}</td>
       <td>${escapeHtml(r.race_num)}</td>
@@ -45,20 +51,31 @@ function render(rows) {
 }
 
 async function load() {
+  const errorEl = $("#error");
+  const seasonEl = $("#season");
+
   try {
-    $("#error").textContent = "";
-    const season = $("#season").value;
+    if (errorEl) errorEl.textContent = "";
+    if (!seasonEl) return;
+
+    const season = seasonEl.value;
     const rows = await fetchJson(`/.netlify/functions/nascarWinners?season=${encodeURIComponent(season)}`);
     render(rows);
-    $("#count").textContent = `${rows.length} rows`;
+
+    // Row count removed on purpose. If you ever re-add it, this won't crash:
+    const countEl = $("#count");
+    if (countEl) countEl.textContent = `${rows.length} rows`;
   } catch (e) {
-    $("#error").textContent = e.message || String(e);
+    if (errorEl) errorEl.textContent = e.message || String(e);
   }
 }
 
 (function init() {
   const seasons = [2026, 2025, 2024, 2023, 2022];
   buildSeasonOptions(seasons, seasons[0]);
-  $("#season").addEventListener("change", load);
+
+  const seasonEl = $("#season");
+  if (seasonEl) seasonEl.addEventListener("change", load);
+
   load();
 })();
