@@ -1,7 +1,11 @@
 const { neon } = require("@neondatabase/serverless");
 
 function json(statusCode, data) {
-  return { statusCode, headers: { "content-type": "application/json" }, body: JSON.stringify(data) };
+  return {
+    statusCode,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(data),
+  };
 }
 
 exports.handler = async (event) => {
@@ -15,15 +19,35 @@ exports.handler = async (event) => {
 
     const rows = Number.isFinite(season)
       ? await sql`
-          select id, season_year, event_name, course, location, winner, score, image_url, image_alt, event_date
+          select
+            id,
+            season_year,
+            event_date,
+            event_name,
+            course,
+            location,
+            winner,
+            score,
+            image_url,
+            image_alt
           from pga_winners
           where season_year = ${season}
-          order by event_name asc, id
+          order by event_date asc nulls last, id
         `
       : await sql`
-          select id, season_year, event_name, course, location, winner, score, image_url, image_alt, event_date
+          select
+            id,
+            season_year,
+            event_date,
+            event_name,
+            course,
+            location,
+            winner,
+            score,
+            image_url,
+            image_alt
           from pga_winners
-          order by season_year desc, event_name asc, id
+          order by season_year asc, event_date asc nulls last, id
         `;
 
     return json(200, rows);
