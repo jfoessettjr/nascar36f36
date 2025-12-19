@@ -1,8 +1,10 @@
 (function () {
   const PLACEHOLDER_ID = "navbar-placeholder";
-  const NAV_PARTIAL_URL = "/partials/navbar.html";
+  const BOTTOMBAR_ID = "bottombar-placeholder";
 
-  // Try a few common keys so you don't get stuck if your admin.js used a different name
+  const NAV_PARTIAL_URL = "/partials/navbar.html";
+  const BOTTOM_PARTIAL_URL = "/partials/bottombar.html";
+
   const TOKEN_KEYS = ["adminToken", "ADMIN_TOKEN", "yt_admin_token", "ytse_admin_token"];
 
   function hasAdminToken() {
@@ -54,41 +56,38 @@
     onScroll();
   }
 
-  async function injectNavbar() {
-    const placeholder = document.getElementById(PLACEHOLDER_ID);
-    if (!placeholder) {
-      console.warn(`Missing #${PLACEHOLDER_ID} on this page`);
-      return;
-    }
+  async function injectPartialInto(id, url) {
+    const el = document.getElementById(id);
+    if (!el) return;
 
-    // Fetch partial
-    const res = await fetch(NAV_PARTIAL_URL, { cache: "no-cache" });
-
+    const res = await fetch(url, { cache: "no-cache" });
     if (!res.ok) {
-      // Make failure obvious
-      const msg = `Navbar partial not found (${res.status}). Expected: ${NAV_PARTIAL_URL}`;
-      console.error(msg);
-      placeholder.innerHTML = `
-        <div style="padding:10px;margin:10px;border:1px solid #f5c2c7;background:#f8d7da;color:#842029;">
-          ${msg}
-        </div>
-      `;
+      console.error(`Partial fetch failed (${res.status}) for ${url}`);
       return;
     }
 
-    const html = await res.text();
-
-    // Inject
-    placeholder.innerHTML = html;
-
-    // Run enhancements
-    const navRoot = placeholder;
-    setActiveLink(navRoot);
-    hideAdminIfNoToken(navRoot);
-    enableShadowAfterScroll(navRoot);
+    el.innerHTML = await res.text();
   }
 
-  injectNavbar().catch((err) => {
-    console.error("Navbar load failed:", err);
-  });
+  async function init() {
+    // 1) Navbar
+    await injectPartialInto(PLACEHOLDER_ID, NAV_PARTIAL_URL);
+
+    const navRoot = document.getElementById(PLACEHOLDER_ID);
+    if (navRoot) {
+      setActiveLink(navRoot);
+      hideAdminIfNoToken(navRoot);
+      enableShadowAfterScroll(navRoot);
+    }
+
+    // 2) Bottom bar (never allowed to break navbar)
+    try {
+      await injectPartialInto(BOTTOMBAR_ID, BOTTOM_PARTIAL_URL);
+    } catch (e) {
+      console.error("Bottom bar failed:", e);
+    }
+  }
+
+  init().catch((err) => console.error("Navbar init failed:", err));
 })();
+

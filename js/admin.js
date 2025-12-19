@@ -62,6 +62,32 @@ async function loadCloudinaryConfig() {
   }
 }
 
+// --- Date helpers ---
+function normalizeDateForInput(v) {
+  // Accepts: "YYYY-MM-DD", ISO timestamp, Date-ish values
+  if (v == null) return "";
+  const s = String(v).trim();
+  if (!s) return "";
+
+  // If it already looks like YYYY-MM-DD, keep it
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  // If ISO timestamp, take first 10 chars
+  if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.slice(0, 10);
+
+  // Last resort: try Date parse
+  const d = new Date(s);
+  if (!Number.isNaN(d.getTime())) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // If unparseable, don't force it
+  return "";
+}
+
 const config = {
   nascar36: {
     read: (season) => `/.netlify/functions/nascar36?season=${encodeURIComponent(season || "")}`,
@@ -92,13 +118,23 @@ const config = {
     read: (season) => `/.netlify/functions/nascarWinners?season=${encodeURIComponent(season || "")}`,
     write: "/.netlify/functions/nascarWinnersAdmin",
     columns: [
-      ["id", "ID"], ["season_year", "Season"], ["race_num", "Race #"], ["race_name", "Race"],
-      ["track", "Track"], ["location", "Location"], ["winner", "Winner"], ["team", "Team"],
-      ["manufacturer", "Manufacturer"], ["image_url", "Image URL"], ["image_alt", "Image Alt"],
+      ["id", "ID"],
+      ["season_year", "Season"],
+      ["event_date", "Event Date"],   // ✅ added
+      ["race_num", "Race #"],
+      ["race_name", "Race"],
+      ["track", "Track"],
+      ["location", "Location"],
+      ["winner", "Winner"],
+      ["team", "Team"],
+      ["manufacturer", "Manufacturer"],
+      ["image_url", "Image URL"],
+      ["image_alt", "Image Alt"],
     ],
     formFields: [
       ["id", "ID (for edit)", "number", "span-3"],
       ["season_year", "Season", "number", "span-3"],
+      ["event_date", "Event Date", "date", "span-3"], // ✅ added (date input)
       ["race_num", "Race #", "number", "span-3"],
       ["race_name", "Race", "text", "span-6"],
       ["winner", "Winner", "text", "span-6"],
@@ -116,13 +152,21 @@ const config = {
     read: (season) => `/.netlify/functions/pgaWinners?season=${encodeURIComponent(season || "")}`,
     write: "/.netlify/functions/pgaWinnersAdmin",
     columns: [
-      ["id", "ID"], ["season_year", "Season"], ["event_name", "Event"], ["course", "Course"],
-      ["location", "Location"], ["winner", "Winner"], ["score", "Score"],
-      ["image_url", "Image URL"], ["image_alt", "Image Alt"],
+      ["id", "ID"],
+      ["season_year", "Season"],
+      ["event_date", "Event Date"],   // ✅ added
+      ["event_name", "Event"],
+      ["course", "Course"],
+      ["location", "Location"],
+      ["winner", "Winner"],
+      ["score", "Score"],
+      ["image_url", "Image URL"],
+      ["image_alt", "Image Alt"],
     ],
     formFields: [
       ["id", "ID (for edit)", "number", "span-3"],
       ["season_year", "Season", "number", "span-3"],
+      ["event_date", "Event Date", "date", "span-3"], // ✅ added (date input)
       ["event_name", "Event", "text", "span-6"],
       ["winner", "Winner", "text", "span-6"],
       ["course", "Course", "text", "span-6"],
@@ -155,56 +199,58 @@ const config = {
     ],
     seasonRequired: false,
   },
-  videoGames: {
-  read: () => "/.netlify/functions/videoGames",
-  write: "/.netlify/functions/videoGamesAdmin",
-  columns: [
-    ["id","ID"],["title","Title"],["platform","Platform"],["status","Status"],
-    ["hours_played","Hours"],["rating","Rating"],["year_released","Year"],["notes","Notes"],
-    ["image_url","Image URL"],["image_alt","Image Alt"],
-  ],
-  formFields: [
-    ["id","ID (for edit)","number","span-3"],
-    ["title","Title","text","span-6"],
-    ["platform","Platform","text","span-6"],
-    ["status","Status","text","span-6"],
-    ["hours_played","Hours Played","number","span-3"],
-    ["rating","Rating","number","span-3"],
-    ["year_released","Year Released","number","span-3"],
-    ["notes","Notes","textarea","span-12"],
-    ["image_url","Image URL","text","span-6"],
-    ["image_alt","Image Alt Text","text","span-6"],
-  ],
-  seasonRequired: false,
-},
 
-vinylRecords: {
-  read: () => "/.netlify/functions/vinylRecords",
-  write: "/.netlify/functions/vinylRecordsAdmin",
-  columns: [
-    ["id","ID"],["artist","Artist"],["album","Album"],["year_released","Year"],
-    ["genre","Genre"],["label","Label"],["condition","Condition"],["notes","Notes"],
-    ["image_url","Image URL"],["image_alt","Image Alt"],
-  ],
-  formFields: [
-    ["id","ID (for edit)","number","span-3"],
-    ["artist","Artist","text","span-6"],
-    ["album","Album","text","span-6"],
-    ["year_released","Year Released","number","span-3"],
-    ["genre","Genre","text","span-6"],
-    ["label","Label","text","span-6"],
-    ["condition","Condition","text","span-6"],
-    ["notes","Notes","textarea","span-12"],
-    ["image_url","Image URL","text","span-6"],
-    ["image_alt","Image Alt Text","text","span-6"],
-  ],
-  seasonRequired: false,
-},
+  videoGames: {
+    read: () => "/.netlify/functions/videoGames",
+    write: "/.netlify/functions/videoGamesAdmin",
+    columns: [
+      ["id","ID"],["title","Title"],["platform","Platform"],["status","Status"],
+      ["hours_played","Hours"],["rating","Rating"],["year_released","Year"],["notes","Notes"],
+      ["image_url","Image URL"],["image_alt","Image Alt"],
+    ],
+    formFields: [
+      ["id","ID (for edit)","number","span-3"],
+      ["title","Title","text","span-6"],
+      ["platform","Platform","text","span-6"],
+      ["status","Status","text","span-6"],
+      ["hours_played","Hours Played","number","span-3"],
+      ["rating","Rating","number","span-3"],
+      ["year_released","Year Released","number","span-3"],
+      ["notes","Notes","textarea","span-12"],
+      ["image_url","Image URL","text","span-6"],
+      ["image_alt","Image Alt Text","text","span-6"],
+    ],
+    seasonRequired: false,
+  },
+
+  vinylRecords: {
+    read: () => "/.netlify/functions/vinylRecords",
+    write: "/.netlify/functions/vinylRecordsAdmin",
+    columns: [
+      ["id","ID"],["artist","Artist"],["album","Album"],["year_released","Year"],
+      ["genre","Genre"],["label","Label"],["condition","Condition"],["notes","Notes"],
+      ["image_url","Image URL"],["image_alt","Image Alt"],
+    ],
+    formFields: [
+      ["id","ID (for edit)","number","span-3"],
+      ["artist","Artist","text","span-6"],
+      ["album","Album","text","span-6"],
+      ["year_released","Year Released","number","span-3"],
+      ["genre","Genre","text","span-6"],
+      ["label","Label","text","span-6"],
+      ["condition","Condition","text","span-6"],
+      ["notes","Notes","textarea","span-12"],
+      ["image_url","Image URL","text","span-6"],
+      ["image_alt","Image Alt Text","text","span-6"],
+    ],
+    seasonRequired: false,
+  },
 };
 
 function getFormValue(key, type) {
   const el = $(`#f_${key}`);
   if (!el) return null;
+
   const raw = el.value;
 
   if (type === "number") {
@@ -212,6 +258,12 @@ function getFormValue(key, type) {
     const n = Number(raw);
     return Number.isFinite(n) ? n : null;
   }
+
+  if (type === "date") {
+    // input[type=date] returns YYYY-MM-DD or ""
+    return raw === "" ? null : raw;
+  }
+
   return raw === "" ? null : raw;
 }
 
@@ -224,17 +276,26 @@ function getPayload(datasetKey) {
 
 function fillFormFromRow(datasetKey, row) {
   const cfg = config[datasetKey];
-  for (const [key] of cfg.formFields) {
+
+  for (const [key, _label, type] of cfg.formFields) {
     const el = $(`#f_${key}`);
     if (!el) continue;
+
+    if (type === "date") {
+      el.value = normalizeDateForInput(row[key]);
+      continue;
+    }
+
     el.value = row[key] == null ? "" : String(row[key]);
   }
+
   refreshImagePreview();
 }
 
 function clearForm() {
   const datasetKey = $("#dataset").value;
   const cfg = config[datasetKey];
+
   for (const [key] of cfg.formFields) {
     const el = $(`#f_${key}`);
     if (el) el.value = "";
@@ -282,17 +343,12 @@ async function openCloudinaryWidget() {
       {
         cloudName: cfg.cloudName,
         uploadPreset: cfg.uploadPreset,
-
-        // Nice defaults:
         sources: ["local", "url", "camera"],
         multiple: false,
         maxFiles: 1,
-
-        // You can enforce size/types by preset too; this is extra:
         clientAllowedFormats: ["png", "jpg", "jpeg", "webp"],
-        maxImageFileSize: 10 * 1024 * 1024, // 10MB
-
-        folder: "ytsejammer", // optional; can be overridden in preset settings
+        maxImageFileSize: 10 * 1024 * 1024,
+        folder: "ytsejammer",
       },
       (error, result) => {
         if (error) return reject(error);
@@ -336,7 +392,6 @@ function buildForm(datasetKey) {
     `;
   }).join("");
 
-  // Add upload controls only when image_url exists on this dataset
   const hasImageUrl = cfg.formFields.some(([k]) => k === "image_url");
   const uploadBlock = hasImageUrl ? `
     <div class="span-12">
@@ -380,7 +435,6 @@ function buildForm(datasetKey) {
   $("#btnDelete").addEventListener("click", async () => doWrite("DELETE"));
   $("#btnClear").addEventListener("click", clearForm);
 
-  // Wire upload buttons if present
   const uploadBtn = $("#btnUploadImage");
   if (uploadBtn) {
     uploadBtn.addEventListener("click", async () => {
@@ -397,7 +451,6 @@ function buildForm(datasetKey) {
   const previewBtn = $("#btnPreviewImage");
   if (previewBtn) previewBtn.addEventListener("click", refreshImagePreview);
 
-  // Live preview when user pastes URL
   const urlInput = $("#f_image_url");
   if (urlInput) urlInput.addEventListener("input", refreshImagePreview);
 
@@ -499,7 +552,6 @@ async function loadRows() {
 }
 
 (async function init() {
-  // Token UI
   $("#token").value = getToken();
 
   $("#saveToken").addEventListener("click", () => {
@@ -526,7 +578,6 @@ async function loadRows() {
 
   $("#load").addEventListener("click", loadRows);
 
-  // Preload Cloudinary config (optional; errors are non-fatal)
   await loadCloudinaryConfig();
 
   buildForm($("#dataset").value);

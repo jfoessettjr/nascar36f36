@@ -478,3 +478,44 @@ code {
   border-color: var(--yt-accent-dark);
 }
 
+/* Bottom bar (extra links/info above footer) */
+.bottom-bar {
+  background: #0b0b0b;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 1.25rem 0;
+}
+
+.bottom-bar__title {
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.bottom-bar__text {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.95rem;
+}
+
+.bottom-bar__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  justify-content: flex-start;
+}
+
+@media (min-width: 768px) {
+  .bottom-bar__links { justify-content: flex-end; }
+}
+
+.bottom-bar__links a {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.bottom-bar__links a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+

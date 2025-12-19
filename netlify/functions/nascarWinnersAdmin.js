@@ -23,11 +23,10 @@ exports.handler = async (event) => {
     if (method === "POST") {
       const b = JSON.parse(event.body || "{}");
       const rows = await sql`
-        insert into nascar_winners
-          (season_year, race_num, race_name, track, location, winner, team, manufacturer, image_url, image_alt)
+        insert into pga_winners
+          (season_year, event_name, course, location, winner, score, image_url, image_alt)
         values
-          (${b.season_year}, ${b.race_num}, ${b.race_name}, ${b.track}, ${b.location},
-           ${b.winner}, ${b.team}, ${b.manufacturer}, ${b.image_url}, ${b.image_alt})
+          (${b.season_year}, ${b.event_name}, ${b.course}, ${b.location}, ${b.winner}, ${b.score}, ${b.image_url}, ${b.image_alt})
         returning *
       `;
       return json(200, rows[0]);
@@ -38,22 +37,19 @@ exports.handler = async (event) => {
       if (!b.id) return json(400, { error: "Missing id" });
 
       const rows = await sql`
-        update nascar_winners
+        update pga_winners
         set
-          season_year = coalesce(${b.season_year}, season_year),
-          race_num = coalesce(${b.race_num}, race_num),
-          race_name = coalesce(${b.race_name}, race_name),
-          track = coalesce(${b.track}, track),
-          location = coalesce(${b.location}, location),
-          winner = coalesce(${b.winner}, winner),
-          team = coalesce(${b.team}, team),
-          manufacturer = coalesce(${b.manufacturer}, manufacturer),
-          image_url = coalesce(${b.image_url}, image_url),
-          image_alt = coalesce(${b.image_alt}, image_alt)
+          season_year = ${b.season_year},
+          event_name = ${b.event_name},
+          course = ${b.course},
+          location = ${b.location},
+          winner = ${b.winner},
+          score = ${b.score},
+          image_url = ${b.image_url},
+          image_alt = ${b.image_alt}
         where id = ${b.id}
         returning *
       `;
-
       return json(200, rows[0] || null);
     }
 
@@ -61,7 +57,7 @@ exports.handler = async (event) => {
       const b = JSON.parse(event.body || "{}");
       if (!b.id) return json(400, { error: "Missing id" });
 
-      const rows = await sql`delete from nascar_winners where id = ${b.id} returning id`;
+      const rows = await sql`delete from pga_winners where id = ${b.id} returning id`;
       return json(200, { deleted: rows[0]?.id ?? null });
     }
 

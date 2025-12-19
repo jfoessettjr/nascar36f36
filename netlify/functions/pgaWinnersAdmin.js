@@ -1,7 +1,11 @@
 const { neon } = require("@neondatabase/serverless");
 
 function json(statusCode, data) {
-  return { statusCode, headers: { "content-type": "application/json" }, body: JSON.stringify(data) };
+  return {
+    statusCode,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(data),
+  };
 }
 
 function isAuthed(event) {
@@ -22,13 +26,35 @@ exports.handler = async (event) => {
 
     if (method === "POST") {
       const b = JSON.parse(event.body || "{}");
+
       const rows = await sql`
         insert into pga_winners
-          (season_year, event_name, course, location, winner, score, image_url, image_alt)
+          (
+            season_year,
+            event_date,
+            event_name,
+            course,
+            location,
+            winner,
+            score,
+            image_url,
+            image_alt
+          )
         values
-          (${b.season_year}, ${b.event_name}, ${b.course}, ${b.location}, ${b.winner}, ${b.score}, ${b.image_url}, ${b.image_alt})
+          (
+            ${b.season_year},
+            ${b.event_date},
+            ${b.event_name},
+            ${b.course},
+            ${b.location},
+            ${b.winner},
+            ${b.score},
+            ${b.image_url},
+            ${b.image_alt}
+          )
         returning *
       `;
+
       return json(200, rows[0]);
     }
 
@@ -39,17 +65,19 @@ exports.handler = async (event) => {
       const rows = await sql`
         update pga_winners
         set
-          season_year = ${b.season_year},
-          event_name = ${b.event_name},
-          course = ${b.course},
-          location = ${b.location},
-          winner = ${b.winner},
-          score = ${b.score},
-          image_url = ${b.image_url},
-          image_alt = ${b.image_alt}
+          season_year = coalesce(${b.season_year}, season_year),
+          event_date  = coalesce(${b.event_date}, event_date),
+          event_name  = coalesce(${b.event_name}, event_name),
+          course      = coalesce(${b.course}, course),
+          location    = coalesce(${b.location}, location),
+          winner      = coalesce(${b.winner}, winner),
+          score       = coalesce(${b.score}, score),
+          image_url   = coalesce(${b.image_url}, image_url),
+          image_alt   = coalesce(${b.image_alt}, image_alt)
         where id = ${b.id}
         returning *
       `;
+
       return json(200, rows[0] || null);
     }
 
