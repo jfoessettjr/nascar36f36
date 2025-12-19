@@ -10,6 +10,20 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function formatDate(value) {
+  if (!value) return "";
+
+  const d = new Date(value);
+  if (isNaN(d)) return "";
+
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+
 function imgCell(url, alt) {
   if (!url) return "";
   const safeUrl = escapeHtml(url);
@@ -38,7 +52,7 @@ function render(rows) {
       <td>${escapeHtml(r.location)}</td>
       <td>${escapeHtml(r.winner)}</td>
       <td>${escapeHtml(r.score)}</td>
-      <td>${escapeHtml(r.event_date)}</td>
+      <td>${formatDate(r.event_date)}</td>
     </tr>
   `).join("");
 }
