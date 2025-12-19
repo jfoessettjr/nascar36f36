@@ -38,6 +38,7 @@ function render(rows) {
       <td>${escapeHtml(r.location)}</td>
       <td>${escapeHtml(r.winner)}</td>
       <td>${escapeHtml(r.score)}</td>
+      <td>${escapeHtml(r.event_date)}</td>
     </tr>
   `).join("");
 }
