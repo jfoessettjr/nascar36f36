@@ -518,4 +518,59 @@ code {
   text-decoration: underline;
 }
 
+/* ================================
+   Bottom Bar
+   ================================ */
+
+.bottom-bar {
+  background: #111;
+  color: #fff;
+  padding: 2.5rem 1rem;
+}
+
+.bottom-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 2rem;
+
+  /* 🚨 THIS PREVENTS VINYL DROPPING */
+  flex-wrap: nowrap;
+}
+
+.bottom-col {
+  min-width: 0;
+}
+
+.bottom-col h6 {
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  color: rgba(255,255,255,0.6);
+}
+
+.bottom-col a {
+  display: block;
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.bottom-col a:hover {
+  color: var(--yt-accent);
+}
+
+
+@media (max-width: 768px) {
+  .bottom-bar-inner {
+    flex-wrap: wrap;
+  }
+}
+
 
