@@ -15,13 +15,13 @@ exports.handler = async (event) => {
 
     const rows = Number.isFinite(season)
       ? await sql`
-          select id, season_year, event_name, course, location, winner, score, image_url, image_alt
+          select id, season_year, event_name, course, location, winner, score, image_url, image_alt, event_date
           from pga_winners
           where season_year = ${season}
           order by event_name asc, id
         `
       : await sql`
-          select id, season_year, event_name, course, location, winner, score, image_url, image_alt
+          select id, season_year, event_name, course, location, winner, score, image_url, image_alt, event_date
           from pga_winners
           order by season_year desc, event_name asc, id
         `;
