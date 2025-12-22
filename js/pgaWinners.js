@@ -110,4 +110,24 @@ async function load() {
 
     const season = $("#season").value;
     const rows = await fetchJson(
-      `/.netlify/functions/pgaWinners?season=${encodeURICompo
+      `/.netlify/functions/pgaWinners?season=${encodeURIComponent(season)}`
+    );
+
+    render(rows);
+    $("#count").textContent = `${rows.length} event${rows.length === 1 ? "" : "s"}`;
+  } catch (e) {
+    $("#error").textContent = e.message || String(e);
+  }
+}
+
+/* -----------------------------------------------------------
+   Init
+----------------------------------------------------------- */
+(function init() {
+  const seasons = [2026, 2025, 2024, 2023, 2022];
+
+  buildSeasonOptions(seasons, seasons[0]);
+  $("#season").addEventListener("change", load);
+
+  load();
+})();
